@@ -20,7 +20,7 @@ async def test_action_anime_invalid_url() -> None:
             headers={"link": "https://myanimelist.net/anime/genre/999999999"}
         )
 
-    assert response.status_code == 500 or response.status_code == 200  # зависит от поведения
+    assert response.status_code == 500 or response.status_code == 200  
 
 
 
@@ -37,7 +37,6 @@ async def test_action_anime_success() -> None:
     assert isinstance(data, list)
     assert len(data) > 0
 
-    # Проверим наличие ключей
     required_keys = {"title", "score", "synopsis"}
     for item in data:
         assert required_keys <= item.keys()

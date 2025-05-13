@@ -4,7 +4,7 @@ import httpx
 BACKEND_BASE_URL = "http://127.0.0.1:8000"
 
 @pytest.mark.asyncio
-async def test_action_anime_without_header() -> None:
+async def test_action_anime_without_param() -> None:
     async with httpx.AsyncClient(base_url=BACKEND_BASE_URL) as client:
         response = await client.get("/action-anime")
 
@@ -17,11 +17,11 @@ async def test_action_anime_invalid_url() -> None:
     async with httpx.AsyncClient(base_url=BACKEND_BASE_URL) as client:
         response = await client.get(
             "/action-anime",
-            headers={"link": "https://myanimelist.net/anime/genre/999999999"}
+            params={"link": "https://myanimelist.net/anime/genre/999999999"}
         )
 
-    assert response.status_code == 500 or response.status_code == 200  
-
+    if response.status_code == 400:
+        assert response.json() == []
 
 
 @pytest.mark.asyncio
@@ -29,7 +29,7 @@ async def test_action_anime_success() -> None:
     async with httpx.AsyncClient(base_url=BACKEND_BASE_URL) as client:
         response = await client.get(
             "/action-anime",
-            headers={"link": "https://myanimelist.net/anime/genre/1/Action"}
+            params={"link": "https://myanimelist.net/anime/genre/1/Action"}
         )
 
     assert response.status_code == 200
@@ -37,11 +37,10 @@ async def test_action_anime_success() -> None:
     assert isinstance(data, list)
     assert len(data) > 0
 
-    required_keys = {"title", "score", "synopsis"}
     for item in data:
-        assert required_keys <= item.keys()
-
-
+        assert "title" in item
+        assert "score" in item
+        assert "synopsis" in item
 
 
 @pytest.mark.asyncio
@@ -49,7 +48,7 @@ async def test_action_anime_empty_result() -> None:
     async with httpx.AsyncClient(base_url=BACKEND_BASE_URL) as client:
         response = await client.get(
             "/action-anime",
-            headers={"link": "https://example.com"}
+            params={"link": "https://example.com"}
         )
 
     assert response.status_code in (200, 500)

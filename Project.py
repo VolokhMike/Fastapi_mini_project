@@ -1,11 +1,11 @@
-from fastapi import FastAPI, Header
+from fastapi import FastAPI, Query
 from bs4 import BeautifulSoup
 import httpx
 import uvicorn
 
 app = FastAPI()
 
-URL = "https://myanimelist.net/anime/genre/1/Action"
+URL = "http://127.0.0.1:8000/action-anime?link=https://myanimelist.net/anime/genre/1/Action"
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 }
@@ -13,7 +13,7 @@ HEADERS = {
 
 @app.get("/action-anime")
 async def get_action_anime(
-        link = Header(...)
+        link: str = Query(...)
 ):
     async with httpx.AsyncClient() as client:
         response = await client.get(link, headers=HEADERS)
